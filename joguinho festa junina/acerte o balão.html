@@ -1,0 +1,1040 @@
+<html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festa Junina: Acerte o Balão!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <style>
+      
+        :root {
+            --color-primary: #d14900; /* Laranja forte - Usado para títulos, bordas principais e destaques */
+            --color-secondary: #5a3e2b; /* Marrom escuro - Ideal para texto principal e bordas internas */
+            --color-background-light: #ffe4b5; /* Bege claro - Usado para painéis e fundos de listas (como o ranking) */
+            --color-background-medium: #deb887; /* Marrom claro - Fundo da grade onde os balões aparecem */
+            --color-background-dark: #8b4513; /* Marrom médio - Fundo do container principal do jogo */
+            --color-wood-border: #a0522d; /* Marrom madeira - Para bordas que simulam madeira */
+            --color-hole-background: #69442b; /* Marrom buraco - Fundo dos "buracos" onde os balões surgem */
+
+            /* Cores específicas para os balões, vibrantes e distintas. */
+            --balao-red: #E74C3C; /* Vermelho vibrante */
+            --balao-blue: #3498DB; /* Azul celeste */
+            --balao-green: #2ECC71; /* Verde esmeralda */
+            --balao-yellow: #F1C40F; /* Amarelo ensolarado */
+            --balao-purple: #9B59B6; /* Roxo vibrante */
+
+            /* Cores para os botões, com variações para o efeito de hover. */
+            --button-start: #32cd32; /* Verde para o botão "Começar" */
+            --button-start-hover: #28a745; /* Verde mais escuro no hover */
+            --button-clear: #e74c3c; /* Vermelho para o botão "Limpar ranking" */
+            --button-clear-hover: #c0392b; /* Vermelho mais escuro no hover */
+        }
+
+        /* Aplica box-sizing: border-box para todos os elementos, garantindo que padding e border sejam incluídos na largura/altura total. */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        /* Estilos aplicados ao corpo da página (body) */
+        body {
+            font-family: 'Bangers', cursive; /* Define a fonte principal para o corpo */
+            position: relative; /* Necessário para posicionar os pseudo-elementos e o parallax */
+            min-height: 100vh; /* Garante que o corpo ocupe pelo menos 100% da altura da viewport */
+            margin: 0; /* Remove margem padrão do navegador */
+            overflow: hidden; /* Evita barras de rolagem indesejadas, útil para o efeito parallax */
+            display: flex; /* Usa flexbox para centralizar e organizar o conteúdo principal */
+            flex-direction: column; /* Organiza os itens em coluna */
+            align-items: center; /* Centraliza horizontalmente */
+            justify-content: center; /* Centraliza verticalmente */
+            padding: 20px 10px; /* Espaçamento interno */
+            color: var(--color-secondary); /* Cor do texto padrão */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); /* Sombra para o texto para melhor legibilidade */
+            z-index: 0; /* Define a ordem de empilhamento (para o efeito parallax) */
+
+            /* Camada de fundo mais "distante" para o efeito parallax. */
+            background-image: url('https://static.vecteezy.com/system/resources/previews/002/187/217/large_2x/festa-junina-with-yellow-background-free-vector.jpg');
+            background-size: 120% 120%; /* Amplia a imagem para permitir movimento sem mostrar bordas */
+            background-position: center center; /* Centraliza a imagem */
+            background-repeat: no-repeat; /* Evita repetição da imagem */
+            animation: panBackgroundSlow 40s linear infinite alternate; /* Animação de movimento lento para criar profundidade */
+        }
+
+        /* Pseudo-elemento ::before para criar uma segunda camada de fundo para o efeito parallax. */
+        body::before {
+            content: ''; /* Conteúdo vazio, pois é um elemento decorativo */
+            position: fixed; /* Fixa o pseudo-elemento na viewport para que ele não role com o conteúdo */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://static.vecteezy.com/system/resources/previews/002/187/217/large_2x/festa-junina-with-yellow-background-free-vector.jpg'); /* Mesma imagem de fundo, mas com propriedades diferentes */
+            background-size: 140% 140%; /* Ainda mais ampliada que o background do body, para um movimento mais rápido */
+            background-position: center center;
+            background-repeat: no-repeat;
+            animation: panBackgroundFast 30s linear infinite alternate; /* Animação mais rápida para simular proximidade */
+            z-index: -1; /* Posiciona-o abaixo do conteúdo do body, mas acima do background do body (que tem z-index: 0) */
+            opacity: 0.2; /* Torna-o sutil e sem distrações */
+            filter: brightness(0.8) blur(1px); /* Suaviza e esmaece um pouco a imagem */
+        }
+
+        /* --- Título Principal (h1) --- */
+        h1 {
+            color: var(--color-primary); /* Cor primária definida nas variáveis */
+            text-shadow: 4px 4px 6px rgba(0,0,0,0.4), 0 0 10px var(--balao-yellow); /* Sombra para profundidade e brilho sutil com a cor do balão amarelo */
+            margin-bottom: 1.5em; /* Margem inferior */
+            font-size: clamp(2.5em, 8vw, 4.5em); /* Tamanho de fonte responsivo: mínimo de 2.5em, ideal de 8% da largura da viewport, máximo de 4.5em */
+            letter-spacing: 2px; /* Espaçamento entre as letras */
+            animation: bounceIn 1s ease-out; /* Animação de entrada com efeito de "bounce" */
+            text-align: center; /* Centraliza o texto */
+            position: relative; /* Necessário para z-index */
+            z-index: 3; /* Garante que o título apareça acima das camadas de fundo */
+        }
+
+        /* --- Container Principal do Jogo --- */
+        .game-container {
+            width: 95%; /* Largura responsiva */
+            max-width: 700px; /* Largura máxima para controle em telas maiores */
+            background-color: var(--color-background-dark); /* Cor de fundo escura */
+            border: 15px solid var(--color-wood-border); /* Borda grossa estilo madeira */
+            border-radius: 20px; /* Cantos arredondados */
+            padding: 30px; /* Espaçamento interno */
+            box-shadow: 8px 8px 20px rgba(0,0,0,0.6), inset 0 0 15px rgba(0,0,0,0.4); /* Sombra externa e interna para dar volume */
+            position: relative; /* Necessário para posicionamento de elementos filhos */
+            background-image: url('https://th.bing.com/th/id/OIP.TpddJO9ai279e3y66WYaZgHaEv?rs=1&pid=ImgDetMain'); /* Imagem de fundo dentro do container (fogueira, etc.) */
+            background-size: cover; /* Cobre todo o container */
+            background-position: center; /* Centraliza a imagem */
+            background-blend-mode: multiply; /* Mistura a cor de fundo com a imagem, escurecendo-a */
+            filter: brightness(0.9); /* Escurece um pouco a imagem para o conteúdo se destacar */
+            z-index: 2; /* Fica acima das camadas de fundo, mas abaixo do overlay */
+        }
+
+        /* --- Grade dos Buracos (onde os balões aparecem) --- */
+        .grid {
+            display: grid; /* Usa CSS Grid para criar uma grade flexível */
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Colunas que se ajustam automaticamente, com largura mínima de 120px e máxima de 1fr (distribuição igual) */
+            gap: 20px; /* Espaçamento entre os itens da grade */
+            padding: 20px; /* Espaçamento interno da grade */
+            background-color: var(--color-background-medium); /* Cor de fundo da grade */
+            border-radius: 15px; /* Cantos arredondados */
+            border: 5px dashed var(--color-primary); /* Borda tracejada com a cor primária */
+            justify-content: center; /* Centraliza os itens da grade se não preencherem todo o espaço */
+            /* Efeito de textura sutil para dar um visual mais rústico. */
+            background-image: radial-gradient(circle at 10% 20%, rgba(0,0,0,0.05) 0%, transparent 50%),
+                               linear-gradient(135deg, rgba(0,0,0,0.03) 0%, transparent 100%);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.3); /* Sombra interna para profundidade */
+        }
+
+        /* --- Buracos (Holes) individuais --- */
+        .hole {
+            width: 100%; /* Ocupa 100% da largura da célula da grid */
+            padding-bottom: 100%; /* Usa padding-bottom para manter a proporção 1:1 (círculo perfeito) */
+            height: 0; /* Define a altura como 0 para que o padding-bottom controle o tamanho */
+            background: radial-gradient(circle at 50% 50%, var(--color-hole-background) 0%, #4a2f1c 80%); /* Gradiente radial para simular profundidade de um buraco */
+            border-radius: 50%; /* Transforma o div em um círculo */
+            display: flex; /* Usa flexbox para posicionar o balão dentro */
+            align-items: flex-end; /* Alinha o balão na parte inferior do buraco */
+            justify-content: center; /* Centraliza o balão horizontalmente */
+            overflow: hidden; /* Garante que o balão não "saia" do buraco quando está na transição inicial */
+            cursor: pointer; /* Muda o cursor para indicar que é clicável */
+            position: relative; /* Necessário para posicionar o balão absolutamente dentro */
+            box-shadow: inset 5px 5px 15px rgba(0,0,0,0.7), 0 0 15px rgba(0,0,0,0.3); /* Sombra interna para aprofundar o buraco e externa para o relevo */
+            border: 3px solid var(--color-secondary); /* Borda do buraco */
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efeito de "bounce" (saltar) na transição de transformação */
+        }
+
+        /* Efeito ao passar o mouse sobre o buraco */
+        .hole:hover {
+            transform: scale(1.08); /* Aumenta um pouco mais no hover para um efeito mais dramático */
+            box-shadow: inset 5px 5px 15px rgba(0,0,0,0.7), 0 0 25px rgba(0,0,0,0.5); /* Sombra mais intensa no hover */
+        }
+
+        /* --- Balões (Balao) --- */
+        .balao {
+            --balao-size: 100px; /* Variável CSS local para o tamanho do balão */
+            width: var(--balao-size);
+            height: var(--balao-size);
+            background-color: var(--balao-red); /* Cor de fundo padrão do balão (vermelho, será sobrescrito pelo JS) */
+            border-radius: 50%; /* Transforma o div em um círculo */
+            position: absolute; /* Posiciona o balão absolutamente dentro do buraco */
+            bottom: calc(-1 * var(--balao-size) - 10px); /* Começa abaixo do buraco, "escondido" */
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Transição com função de temporização elástica para o efeito de "subir" */
+            cursor: pointer; /* Indica que o balão é clicável */
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.4), inset -3px -3px 8px rgba(255,255,255,0.3); /* Sombra e brilho internos para dar volume ao balão */
+            display: flex; /* Para centralizar o número de pontos dentro do balão */
+            align-items: center; /* Centraliza verticalmente */
+            justify-content: center; /* Centraliza horizontalmente */
+            font-size: 3.5em; /* Tamanho da fonte para o número de pontos */
+            color: white; /* Cor do texto do número */
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.5); /* Sombra para o número */
+            animation: float 2s infinite alternate ease-in-out; /* Animação de flutuação suave */
+            transform: scale(0.8); /* Inicia um pouco menor para um efeito de "surgir" */
+            user-select: none; /* Impede que o texto dentro do balão seja selecionado */
+            font-weight: bold; /* Deixa o texto em negrito */
+            will-change: transform, bottom, opacity; /* Sugestão para o navegador otimizar animações nessas propriedades */
+        }
+
+        /* Classe '.up' adicionada via JavaScript quando o balão deve "subir" */
+        .balao.up {
+            bottom: 20px; /* Posição final do balão quando ele está "para cima" */
+            transform: scale(1); /* Volta ao tamanho normal */
+            animation: float 2s infinite alternate ease-in-out, appearScale 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Combina a flutuação com uma animação de "aparecer com bounce" */
+        }
+
+        /* Pseudo-elemento ::before para criar o bico/triângulo do balão */
+        .balao::before {
+            content: '';
+            position: absolute; /* Posicionado absolutamente em relação ao balão */
+            top: -15px; /* Acima do balão */
+            left: 50%; /* Centralizado horizontalmente */
+            transform: translateX(-50%); /* Ajusta para centralizar perfeitamente */
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent; /* Lado esquerdo do triângulo transparente */
+            border-right: 12px solid transparent; /* Lado direito do triângulo transparente */
+            border-bottom: 25px solid; /* Base do triângulo, que define a cor */
+            filter: brightness(80%); /* Torna o bico ligeiramente mais escuro que o corpo do balão */
+        }
+
+        /* Classes de Cores dos Balões - Adicionadas via JavaScript para mudar a cor do balão e do seu bico */
+        .balao.red { background-color: var(--balao-red); }
+        .balao.red::before { border-bottom-color: var(--balao-red); }
+        .balao.blue { background-color: var(--balao-blue); }
+        .balao.blue::before { border-bottom-color: var(--balao-blue); }
+        .balao.green { background-color: var(--balao-green); }
+        .balao.green::before { border-bottom-color: var(--balao-green); }
+        .balao.yellow { background-color: var(--balao-yellow); }
+        .balao.yellow::before { border-bottom-color: var(--balao-yellow); }
+        .balao.purple { background-color: var(--balao-purple); }
+        .balao.purple::before { border-bottom-color: var(--balao-purple); }
+
+        /* Efeito de "estouro" do balão - Adicionado via JavaScript após o clique */
+        .balao.bonked {
+            animation: bonkEffect 0.3s ease-out forwards; /* Animação de estouro, 'forwards' mantém o estado final (sumir) */
+            pointer-events: none; /* Impede que o balão seja clicado novamente enquanto está "estourando" */
+        }
+
+        /* --- Placar de Pontuação e Tempo --- */
+        .score-board {
+            background-color: var(--color-background-light); /* Fundo claro */
+            border: 5px solid var(--color-primary); /* Borda com a cor primária */
+            border-radius: 15px; /* Cantos arredondados */
+            padding: 15px 25px; /* Espaçamento interno */
+            margin-top: 25px; /* Margem superior */
+            margin-bottom: 25px; /* Margem inferior */
+            font-size: clamp(1.2em, 4vw, 1.8em); /* Tamanho de fonte responsivo */
+            font-weight: bold; /* Negrito */
+            color: var(--color-primary); /* Cor do texto */
+            display: flex; /* Usa flexbox para alinhar pontuação e tempo */
+            justify-content: space-around; /* Distribui o espaço igualmente entre os itens */
+            align-items: center; /* Centraliza verticalmente */
+            width: 95%; /* Largura responsiva */
+            max-width: 700px; /* Largura máxima */
+            box-shadow: 3px 3px 12px rgba(0,0,0,0.3); /* Sombra para dar relevo */
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.7); /* Sombra de texto mais suave */
+            animation: fadeIn 1s ease-in; /* Animação de aparecimento suave */
+            flex-wrap: wrap; /* Permite que os itens quebrem linha em telas menores */
+            gap: 10px; /* Espaçamento entre os itens flexbox */
+            position: relative; /* Necessário para z-index */
+            z-index: 3; /* Fica acima das camadas de fundo */
+        }
+
+        /* --- Botões Gerais --- */
+        .button {
+            padding: 18px 35px; /* Espaçamento interno */
+            font-size: clamp(1.5em, 6vw, 2em); /* Tamanho de fonte responsivo */
+            border: none; /* Sem borda padrão */
+            border-radius: 12px; /* Cantos arredondados */
+            cursor: pointer; /* Indica que é clicável */
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.5); /* Sombra para relevo */
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s; /* Transição com bounce para transformação e cor de fundo */
+            text-transform: uppercase; /* Texto em maiúsculas */
+            letter-spacing: 1px; /* Espaçamento entre letras */
+            font-family: 'Bangers', cursive; /* Fonte do jogo */
+            outline: none; /* Remove contorno de foco padrão */
+            text-decoration: none; /* Remove sublinhado */
+            display: inline-block; /* Permite definir largura/altura e aplicar padding */
+            color: white; /* Cor do texto */
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.3); /* Sombra para o texto */
+            position: relative; /* Necessário para z-index */
+            z-index: 4; /* Fica acima da maioria dos elementos */
+            margin-top: 20px; /* Margem superior */
+        }
+
+        /* Efeito ao passar o mouse sobre o botão */
+        .button:hover {
+            transform: scale(1.12); /* Aumenta um pouco mais no hover */
+        }
+
+        /* Efeito ao clicar/ativar o botão */
+        .button:active {
+            transform: scale(0.95); /* Diminui um pouco ao ser clicado */
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5); /* Sombra mais compacta ao clicar */
+        }
+
+        /* Cores específicas para o botão "Começar" */
+        .button.start {
+            background-color: var(--button-start);
+        }
+        .button.start:hover {
+            background-color: var(--button-start-hover);
+        }
+
+        /* Cores específicas para o botão "Limpar Ranking" */
+        .button.clear-rank {
+            background-color: var(--button-clear);
+        }
+        .button.clear-rank:hover {
+            background-color: var(--button-clear-hover);
+        }
+
+        /* --- Mensagens do Jogo (abaixo do placar) --- */
+        .message {
+            margin-top: 25px; /* Margem superior */
+            font-size: clamp(1em, 4vw, 1.5em); /* Tamanho de fonte responsivo */
+            color: var(--color-primary); /* Cor do texto */
+            font-weight: bold; /* Negrito */
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.7); /* Sombra suave */
+            animation: fadeIn 1s ease-in; /* Animação de aparecimento */
+            text-align: center; /* Centraliza o texto */
+            padding: 0 10px; /* Espaçamento lateral */
+            position: relative; /* Necessário para z-index */
+            z-index: 3; /* Fica acima das camadas de fundo */
+        }
+
+        /* --- Animações --- */
+
+        /* Animação de flutuação para os balões */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); } /* Início: sem deslocamento Y, sem rotação */
+            50% { transform: translateY(-15px) rotate(2deg); } /* Meio: sobe 15px, gira levemente para a direita */
+            100% { transform: translateY(0px) rotate(-2deg); } /* Fim: volta à posição original, gira levemente para a esquerda */
+        }
+
+        /* Animação para o balão aparecer com um efeito de escala */
+        @keyframes appearScale {
+            0% { transform: scale(0.5); opacity: 0; } /* Começa pequeno e transparente */
+            80% { transform: scale(1.1); opacity: 1; } /* Cresce um pouco mais que o normal para o efeito "bounce" */
+            100% { transform: scale(1); opacity: 1; } /* Volta ao tamanho normal */
+        }
+
+        /* Animação de "estouro" do balão */
+        @keyframes bonkEffect {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; } /* Início: tamanho normal, opaco */
+            50% { transform: scale(1.3) rotate(15deg); opacity: 0.7; } /* Meio: aumenta e gira, fica um pouco transparente */
+            100% { transform: scale(0) rotate(30deg); opacity: 0; } /* Fim: encolhe até sumir, gira mais */
+        }
+
+        /* Animação de entrada para o título principal (efeito de "bounce") */
+        @keyframes bounceIn {
+            0% { transform: scale(0.5) translateY(-50px); opacity: 0; } /* Começa pequeno, acima e transparente */
+            50% { transform: scale(1.15) translateY(0); opacity: 1; } /* Aumenta um pouco mais que o normal e desce */
+            70% { transform: scale(0.9); } /* Pequeno recuo */
+            100% { transform: scale(1); } /* Volta ao tamanho normal */
+        }
+
+        /* Animação de aparecimento suave */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); } /* Inicia transparente e ligeiramente abaixo */
+            to { opacity: 1; transform: translateY(0); } /* Termina opaco e na posição normal */
+        }
+
+        /* Animação de desaparecimento suave */
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); } /* Inicia opaco e na posição normal */
+            to { opacity: 0; transform: translateY(20px); } /* Termina transparente e ligeiramente abaixo */
+        }
+
+        /* Animação para os confetes */
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; } /* Início: na posição, sem rotação, tamanho normal */
+            50% { opacity: 0.8; } /* Fica ligeiramente transparente no meio */
+            100% { transform: translateY(-400px) rotate(720deg) scale(0.2); opacity: 0; } /* Voa para cima, gira, encolhe e some */
+        }
+
+        /* Animação para o texto de pontuação (+1) */
+        @keyframes scorePop {
+            0% { transform: translateY(0) scale(0.8); opacity: 1; } /* Início: na posição, um pouco menor, opaco */
+            100% { transform: translateY(-70px) scale(1.5); opacity: 0; } /* Sobe 70px, aumenta, e some */
+        }
+
+        /* ANIMAÇÕES PARA AS CAMADAS DE PARALLAX */
+        /* Animação de "pan" (movimento) lento para a camada de fundo mais distante */
+        @keyframes panBackgroundSlow {
+            0% { background-position: 0% 0%; } /* Começa no canto superior esquerdo */
+            100% { background-position: 100% 100%; } /* Termina no canto inferior direito */
+        }
+
+        /* Animação de "pan" (movimento) rápido para a camada de fundo mais próxima */
+        @keyframes panBackgroundFast {
+            0% { background-position: 100% 0%; } /* Começa no canto superior direito */
+            100% { background-position: 0% 100%; } /* Termina no canto inferior esquerdo */
+        }
+
+        /* --- Estilo dos Confetes --- */
+        .confetti {
+            position: absolute; /* Posicionado absolutamente na tela */
+            width: 10px; /* Tamanho do confete */
+            height: 10px;
+            border-radius: 50%; /* Transforma em círculo */
+            background-color: #f00; /* Cor padrão (será alterada por JS) */
+            top: 50%; /* Posição inicial no centro do clique */
+            left: 50%;
+            transform: translate(-50%, -50%); /* Ajusta para centralizar o confete no ponto de clique */
+            animation: confetti 1.2s linear forwards; /* Animação de confete, 'forwards' mantém o estado final */
+            opacity: 0; /* Inicia invisível e a animação o faz aparecer e desaparecer */
+            z-index: 10; /* Fica acima de quase tudo */
+            pointer-events: none; /* Não impede cliques em elementos abaixo */
+        }
+
+        /* --- Estilo do Texto de Pontuação (+1) --- */
+        .score-effect {
+            position: absolute; /* Posicionado absolutamente na tela */
+            font-size: 2.5em; /* Tamanho da fonte para o "+1" */
+            font-weight: bold; /* Negrito */
+            color: var(--balao-green); /* Cor do texto (verde) */
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.7); /* Sombra forte para o texto */
+            pointer-events: none; /* Não impede cliques em elementos abaixo */
+            animation: scorePop 1s ease-out forwards; /* Animação de "pop" para o texto de pontuação */
+            z-index: 11; /* Fica acima dos confetes */
+        }
+
+        /* --- Game Overlay (Tela de Início/Fim) --- */
+        .game-overlay {
+            position: fixed; /* Fixo na viewport */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* Fundo semi-transparente escuro para cobrir a tela */
+            display: flex; /* Usa flexbox para centralizar o conteúdo */
+            flex-direction: column; /* Conteúdo em coluna */
+            justify-content: center; /* Centraliza verticalmente */
+            align-items: center; /* Centraliza horizontalmente */
+            z-index: 5; /* Fica acima de todos os elementos do jogo */
+            opacity: 1; /* Inicia visível */
+            transition: opacity 0.6s ease-in-out; /* Transição suave para quando for escondido */
+            padding: 20px; /* Espaçamento interno */
+        }
+
+        /* Classe '.hidden' adicionada via JavaScript para esconder o overlay */
+        .game-overlay.hidden {
+            opacity: 0; /* Torna-o transparente */
+            pointer-events: none; /* Desativa a interação com o overlay quando escondido */
+        }
+
+        /* Conteúdo dentro do overlay */
+        .overlay-content {
+            background-color: var(--color-background-light); /* Fundo claro */
+            border: 7px solid var(--color-primary); /* Borda primária */
+            border-radius: 20px; /* Cantos arredondados */
+            padding: 30px; /* Espaçamento interno */
+            text-align: center; /* Centraliza o texto */
+            box-shadow: 0 0 30px rgba(0,0,0,0.9); /* Sombra proeminente */
+            max-width: 90%; /* Largura máxima */
+            display: flex; /* Usa flexbox para organizar o conteúdo */
+            flex-direction: column; /* Conteúdo em coluna */
+            align-items: center; /* Centraliza horizontalmente */
+            transform: scale(0.9); /* Inicia um pouco menor para o efeito de pop-in */
+            animation: overlayPopIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; /* Animação de "pop-in" ao aparecer */
+        }
+
+        /* Animação de "pop-in" para o conteúdo do overlay */
+        @keyframes overlayPopIn {
+            0% { transform: scale(0.5); opacity: 0; } /* Começa pequeno e transparente */
+            100% { transform: scale(1); opacity: 1; } /* Cresce até o tamanho normal e fica opaco */
+        }
+
+        /* Título dentro do overlay */
+        .overlay-content h2 {
+            color: var(--color-primary); /* Cor primária */
+            font-size: clamp(2em, 7vw, 3.5em); /* Tamanho de fonte responsivo */
+            margin-bottom: 20px; /* Margem inferior */
+            text-shadow: 3px 3px 5px rgba(0,0,0,0.3); /* Sombra para o texto */
+        }
+
+        /* Parágrafos dentro do overlay */
+        .overlay-content p {
+            font-size: clamp(1.1em, 4vw, 1.6em); /* Tamanho de fonte responsivo */
+            color: var(--color-secondary); /* Cor secundária */
+            margin-bottom: 25px; /* Margem inferior */
+            line-height: 1.4; /* Espaçamento entre linhas */
+        }
+
+        /* --- Estilos para o campo de nome de usuário --- */
+        .username-input-group {
+            margin-bottom: 20px; /* Margem inferior */
+            width: 100%; /* Ocupa toda a largura disponível */
+            max-width: 300px; /* Largura máxima */
+        }
+
+        /* Rótulo do campo de nome de usuário */
+        .username-input-group label {
+            display: block; /* Ocupa a própria linha */
+            margin-bottom: 10px; /* Margem inferior */
+            font-size: 1.2em; /* Tamanho da fonte */
+            color: var(--color-secondary); /* Cor do texto */
+        }
+
+        /* Campo de texto para o nome de usuário */
+        .username-input-group input[type="text"] {
+            width: 100%; /* Ocupa 100% da largura do seu container */
+            padding: 12px 15px; /* Espaçamento interno */
+            border: 3px solid var(--color-primary); /* Borda com a cor primária */
+            border-radius: 8px; /* Cantos arredondados */
+            font-size: 1.1em; /* Tamanho da fonte */
+            font-family: 'Bangers', cursive; /* Fonte do jogo */
+            background-color: #fff; /* Fundo branco */
+            color: var(--color-secondary); /* Cor do texto */
+            text-align: center; /* Centraliza o texto digitado */
+            outline: none; /* Remove contorno de foco padrão */
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.2); /* Sombra interna */
+            transition: border-color 0.3s, box-shadow 0.3s; /* Transição suave para foco */
+        }
+
+        /* Efeito ao focar no campo de texto */
+        .username-input-group input[type="text"]:focus {
+            border-color: var(--balao-blue); /* Muda a cor da borda */
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.3), 0 0 8px var(--balao-blue); /* Adiciona um brilho */
+        }
+
+        /* --- Estilos para o Ranking --- */
+        .ranking-section {
+            margin-top: 30px; /* Margem superior */
+            width: 100%; /* Ocupa toda a largura disponível */
+            max-width: 400px; /* Largura máxima */
+            background-color: var(--color-background-medium); /* Fundo médio */
+            border: 5px solid var(--color-wood-border); /* Borda estilo madeira */
+            border-radius: 15px; /* Cantos arredondados */
+            padding: 20px; /* Espaçamento interno */
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.4); /* Sombra para relevo */
+        }
+
+        /* Título do ranking */
+        .ranking-section h3 {
+            color: var(--color-primary); /* Cor primária */
+            font-size: clamp(1.5em, 5vw, 2.5em); /* Tamanho de fonte responsivo */
+            margin-bottom: 15px; /* Margem inferior */
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.3); /* Sombra para o texto */
+        }
+
+        /* Lista de ranking */
+        .ranking-list {
+            list-style: none; /* Remove marcadores de lista padrão */
+            padding: 0; /* Remove padding padrão */
+            margin: 0; /* Remove margem padrão */
+            font-size: clamp(1em, 3.5vw, 1.4em); /* Tamanho de fonte responsivo */
+            color: var(--color-secondary); /* Cor do texto */
+        }
+
+        /* Cada item da lista de ranking */
+        .ranking-list li {
+            background-color: var(--color-background-light); /* Fundo claro */
+            border: 2px solid var(--color-wood-border); /* Borda estilo madeira */
+            border-radius: 8px; /* Cantos arredondados */
+            padding: 10px 15px; /* Espaçamento interno */
+            margin-bottom: 10px; /* Margem inferior entre os itens */
+            display: flex; /* Usa flexbox para alinhar nome e pontuação */
+            justify-content: space-between; /* Distribui o espaço entre nome e pontuação */
+            align-items: center; /* Centraliza verticalmente */
+            box-shadow: 1px 1px 5px rgba(0,0,0,0.2); /* Sombra suave */
+            transition: transform 0.2s ease-out; /* Transição para o efeito de hover */
+        }
+
+        /* Efeito ao passar o mouse sobre um item do ranking */
+        .ranking-list li:hover {
+            transform: translateX(5px); /* Move ligeiramente para a direita */
+        }
+
+        /* Remove a margem inferior do último item da lista */
+        .ranking-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Estilo para o span que contém o nome/pontuação dentro do item da lista */
+        .ranking-list li span {
+            font-weight: bold; /* Negrito */
+            color: var(--color-primary); /* Cor primária */
+        }
+
+        /* --- Media Queries para Responsividade --- */
+        /* Ajustes para telas com largura máxima de 600px (smartphones e tablets pequenos) */
+        @media (max-width: 600px) {
+            body {
+                padding: 15px 5px; /* Reduz o padding do corpo */
+            }
+
+            h1 {
+                font-size: clamp(2em, 9vw, 3.5em); /* Ajusta o tamanho do título */
+                margin-bottom: 1em;
+            }
+
+            .game-container {
+                padding: 20px; /* Reduz o padding do container do jogo */
+                border-width: 10px; /* Reduz a largura da borda */
+            }
+
+            .grid {
+                grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); /* Ajusta o tamanho mínimo das colunas da grid */
+                gap: 15px; /* Reduz o espaçamento da grid */
+                padding: 15px; /* Reduz o padding da grid */
+            }
+
+            .balao {
+                --balao-size: 80px; /* Reduz o tamanho do balão */
+                font-size: 3em; /* Ajusta o tamanho da fonte do número do balão */
+            }
+
+            .score-board {
+                font-size: clamp(1em, 4vw, 1.5em); /* Ajusta o tamanho da fonte do placar */
+                padding: 12px 15px; /* Reduz o padding do placar */
+            }
+
+            .button {
+                padding: 15px 30px; /* Reduz o padding dos botões */
+                font-size: clamp(1.2em, 5vw, 1.8em); /* Ajusta o tamanho da fonte dos botões */
+                margin-top: 20px;
+            }
+
+            .message {
+                font-size: clamp(0.9em, 3.5vw, 1.2em); /* Ajusta o tamanho da fonte das mensagens */
+            }
+
+            .overlay-content h2 {
+                font-size: clamp(1.8em, 8vw, 3em); /* Ajusta o tamanho do título do overlay */
+            }
+
+            .overlay-content p {
+                font-size: clamp(1em, 3.5vw, 1.4em); /* Ajusta o tamanho do parágrafo do overlay */
+            }
+
+            .username-input-group {
+                max-width: 250px; /* Reduz a largura máxima do campo de nome */
+            }
+
+            .ranking-section {
+                padding: 15px; /* Reduz o padding da seção de ranking */
+                max-width: 350px; /* Reduz a largura máxima do ranking */
+            }
+        }
+
+        /* Ajustes para telas com largura máxima de 400px (smartphones menores) */
+        @media (max-width: 400px) {
+            .grid {
+                grid-template-columns: repeat(auto-fit, minmax(75px, 1fr)); /* Ajusta ainda mais o tamanho das colunas da grid */
+                gap: 8px; /* Reduz mais o espaçamento da grid */
+                padding: 8px; /* Reduz mais o padding da grid */
+            }
+
+            .balao {
+                --balao-size: 65px; /* Reduz ainda mais o tamanho do balão */
+                font-size: 2.2em; /* Ajusta a fonte do número do balão */
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Festa Junina: Acerte o Balão!</h1>
+
+    <div class="score-board">
+        <div>Pontuação: <span id="score">0</span></div> <div>Tempo: <span id="time">30</span>s</div> </div>
+
+    <div class="game-container">
+        <div class="grid">
+            <div class="hole"><div class="balao" data-index="0"></div></div>
+            <div class="hole"><div class="balao" data-index="1"></div></div>
+            <div class="hole"><div class="balao" data-index="2"></div></div>
+            <div class="hole"><div class="balao" data-index="3"></div></div>
+            <div class="hole"><div class="balao" data-index="4"></div></div>
+            <div class="hole"><div class="balao" data-index="5"></div></div>
+            <div class="hole"><div class="balao" data-index="6"></div></div>
+            <div class="hole"><div class="balao" data-index="7"></div></div>
+            <div class="hole"><div class="balao" data-index="8"></div></div>
+            <div class="hole"><div class="balao" data-index="9"></div></div> 
+            <div class="hole"><div class="balao" data-index="10"></div></div> 
+            <div class="hole"><div class="balao" data-index="11"></div></div> 
+        </div>
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <div class="game-overlay" id="gameOverlay">
+        <div class="overlay-content">
+            <h2 id="overlayTitle">Bem-vindo(a) à Festa Junina!</h2> <p id="overlayMessage">Acerte os balões que aparecerem na fogueira o mais rápido que puder!<br>Cuidado para não deixar nenhum passar!</p> <div class="username-input-group">
+                <label for="username">Seu nome de jogador:</label>
+                <input type="text" id="username" placeholder="Digite seu nome aqui" maxlength="15"> </div>
+
+            <button id="overlayStartButton" class="button start">Começar Jogo</button> <div class="ranking-section">
+                <h3>Melhores Pontuações 🔥</h3>
+                <ul id="rankList" class="ranking-list">
+                    </ul>
+                <button id="clearRankButton" class="button clear-rank">Limpar Ranking</button> </div>
+        </div>
+    </div>
+
+    <audio id="bonkSound" src="https://www.myinstants.com/media/sounds/tiro.mp3" preload="auto"></audio> <audio id="gameOverSound" src="https://www.soundjay.com/misc/sounds/fail-trombone-01.mp3" preload="auto"></audio> <audio id="backgroundMusic" src="https://cs53.clideo.com/p/9QQ2yaLxVmZbDNZhYRf3oA/8890e0a993227d4ab8297fc46038f33f/whatsapp-audio-2025-06-30-at-142408-1-tfgslj.mp3" loop preload="auto"></audio> <script>
+        // --- Seleção de Elementos DOM ---
+        // Seleciona todos os elementos com a classe 'balao' (os balões em si).
+        const balas = document.querySelectorAll('.balao');
+        // Seleciona o span onde a pontuação será exibida.
+        const scoreDisplay = document.getElementById('score');
+        // Seleciona o span onde o tempo restante será exibido.
+        const timeDisplay = document.getElementById('time');
+        // Seleciona o div onde as mensagens do jogo serão exibidas.
+        const messageDisplay = document.getElementById('message');
+        // Seleciona o container principal do jogo. Usado para anexar confetes e efeitos de pontuação.
+        const gameContainer = document.querySelector('.game-container');
+
+        // Seleciona o overlay do jogo (tela de início/fim).
+        const gameOverlay = document.getElementById('gameOverlay');
+        // Título dentro do overlay.
+        const overlayTitle = document.getElementById('overlayTitle');
+        // Mensagem dentro do overlay.
+        const overlayMessage = document.getElementById('overlayMessage');
+        // Botão "Começar Jogo" dentro do overlay.
+        const overlayStartButton = document.getElementById('overlayStartButton');
+            
+        // Elementos relacionados ao nome de usuário e ranking
+        // Campo de input para o nome do jogador.
+        const usernameInput = document.getElementById('username');
+        // Lista não ordenada onde os rankings serão exibidos.
+        const rankList = document.getElementById('rankList');
+        // Botão para limpar o ranking.
+        const clearRankButton = document.getElementById('clearRankButton');
+
+        // Elementos de áudio (referências aos elementos <audio> no HTML).
+        const bonkSound = document.getElementById('bonkSound'); // Som de acerto
+        const gameOverSound = document.getElementById('gameOverSound'); // Som de fim de jogo
+        const backgroundMusic = document.getElementById('backgroundMusic'); // Música de fundo
+
+        // --- Variáveis de Estado do Jogo ---
+        let score = 0; // Pontuação atual do jogador.
+        let lastBala; // Armazena o último balão que apareceu para evitar repetição imediata.
+        let timeUp = false; // Flag que indica se o tempo de jogo acabou.
+        let timeLeft = 30; // Tempo inicial do jogo em segundos.
+        let timerInterval; // Variável para armazenar o ID do setInterval do timer.
+        let gameActive = false; // Flag que indica se o jogo está ativo (em andamento).
+        let popUpTimeout; // Variável para armazenar o ID do setTimeout que faz o balão aparecer. 
+        let currentPlayerName = "Convidado"; // Nome padrão do jogador antes de ser inserido.
+        const MAX_RANK_ENTRIES = 5; // Constante para limitar o número de entradas no ranking.
+        
+        // Cores dos balões que serão alternadas.
+        const colors = ['red', 'blue', 'green', 'yellow', 'purple'];
+            
+        // --- Funções de Áudio --- 
+        /**
+         * Toca um elemento de áudio.
+         * Garante que o áudio seja reiniciado se já estiver tocando para múltiplos cliques rápidos.
+         * @param {HTMLAudioElement} audioElement - O elemento de áudio a ser tocado.
+         */
+        function playSound(audioElement) { 
+            if (audioElement) { 
+                audioElement.currentTime = 0; // Reinicia o áudio do começo
+                audioElement.play().catch(e => console.log("Erro ao tocar áudio:", e)); // Tenta tocar e captura erros (ex: autoplay policy)
+            } 
+        } 
+
+        // --- Funções de Ranking --- 
+        /**
+         * Obtém o ranking salvo no Local Storage e o retorna ordenado por pontuação.
+         * @returns {Array<Object>} Um array de objetos {name: string, score: number}.
+         */
+        function getRankings() { 
+            // Tenta parsear os dados do Local Storage; se não houver, retorna um array vazio.
+            const rankings = JSON.parse(localStorage.getItem('festaJuninaRankings')) || []; 
+            // Ordena o ranking em ordem decrescente de pontuação (maior primeiro).
+            return rankings.sort((a, b) => b.score - a.score); 
+        } 
+
+        /**
+         * Salva uma nova pontuação no ranking e atualiza a exibição.
+         * @param {string} name - O nome do jogador.
+         * @param {number} score - A pontuação alcançada.
+         */
+        function saveRanking(name, score) { 
+            const rankings = getRankings(); // Pega o ranking atual
+            rankings.push({ name, score }); // Adiciona a nova entrada
+            const sortedRankings = rankings.sort((a, b) => b.score - a.score); // Reordena
+            // Limita o número de entradas no ranking ao MAX_RANK_ENTRIES
+            const topRankings = sortedRankings.slice(0, MAX_RANK_ENTRIES); 
+            // Salva o ranking atualizado no Local Storage (converte para string JSON)
+            localStorage.setItem('festaJuninaRankings', JSON.stringify(topRankings)); 
+            displayRankings(); // Atualiza a lista exibida no overlay
+        } 
+
+        /**
+         * Exibe o ranking atual no elemento UL com id 'rankList'.
+         */
+        function displayRankings() { 
+            const rankings = getRankings(); // Obtém o ranking ordenado
+            rankList.innerHTML = ''; // Limpa qualquer conteúdo existente na lista
+
+            // Se não houver pontuações, exibe uma mensagem.
+            if (rankings.length === 0) { 
+                rankList.innerHTML = '<li>Nenhuma pontuação registrada ainda.</li>'; 
+                return; 
+            } 
+
+            // Itera sobre as entradas do ranking e cria um item de lista para cada uma.
+            rankings.forEach((entry, index) => { 
+                const li = document.createElement('li'); // Cria um novo elemento <li>
+                // Define o conteúdo HTML do <li> com o nome e a pontuação.
+                li.innerHTML = `<span>${index + 1}. ${entry.name}</span> <span>${entry.score} pts</span>`; 
+                rankList.appendChild(li); // Adiciona o <li> à lista do ranking
+            }); 
+        } 
+
+        /**
+         * Limpa todo o ranking salvo no Local Storage após confirmação do usuário.
+         */
+        function clearRankings() { 
+            // Pede confirmação ao usuário antes de limpar.
+            if (confirm("Tem certeza que deseja limpar todo o ranking?")) { 
+                localStorage.removeItem('festaJuninaRankings'); // Remove o item do Local Storage
+                displayRankings(); // Atualiza a exibição (mostrará a mensagem "Nenhuma pontuação registrada...")
+            } 
+        } 
+            
+        // --- Funções do Jogo --- 
+        /**
+         * Gera um tempo aleatório para o balão aparecer, ajustando a dificuldade conforme o tempo restante.
+         * Torna o jogo mais rápido (menor tempo de pop-up) à medida que o tempo diminui.
+         * @returns {number} O tempo em milissegundos para o próximo balão aparecer.
+         */
+        function getPopUpTime() { 
+            const remainingTime = timeLeft; // Tempo restante no jogo
+            let minTime, maxTime; 
+
+            if (remainingTime > 20) {  // Nos primeiros 10 segundos (30 a 21s)
+                minTime = 800; maxTime = 1800; // Tempo de pop-up mais lento
+            } else if (remainingTime > 10) {  // Nos 10 segundos seguintes (20 a 11s)
+                minTime = 600; maxTime = 1400; // Tempo médio de pop-up
+            } else {  // Nos últimos 10 segundos (10s ou menos)
+                minTime = 400; maxTime = 1000; // Tempo de pop-up mais rápido
+            } 
+            // Retorna um número aleatório entre minTime e maxTime.
+            return Math.round(Math.random() * (maxTime - minTime) + minTime); 
+        } 
+
+        /**
+         * Seleciona um balão aleatório da lista de balões disponíveis.
+         * Evita que o mesmo balão apareça consecutivamente no mesmo buraco.
+         * @param {NodeListOf<Element>} balas - Uma NodeList de todos os elementos balão.
+         * @returns {HTMLElement} O elemento balão selecionado.
+         */
+        function randomBala(balas) { 
+            const idx = Math.floor(Math.random() * balas.length); // Gera um índice aleatório
+            const bala = balas[idx]; // Seleciona o balão pelo índice
+            // Se o balão selecionado for o mesmo que o último OU se houver apenas um balão,
+            // chama a função novamente para tentar outra seleção.
+            if (bala === lastBala && balas.length > 1) { 
+                return randomBala(balas); 
+            } 
+            lastBala = bala; // Atualiza o último balão que apareceu
+            return bala; 
+        } 
+
+        /**
+         * Faz um balão "aparecer" em um buraco aleatório.
+         * Controla a lógica de aparecimento e desaparecimento dos balões.
+         */
+        function popUp() { 
+            // Se o tempo acabou ou o jogo não está ativo, para a função.
+            if (timeUp || !gameActive) { 
+                return; 
+            } 
+
+            const bala = randomBala(balas); // Seleciona um balão aleatório
+
+            // Se o balão já estiver 'up' (visível) ou 'bonked' (estourado), tenta novamente em 100ms.
+            if (bala.classList.contains('up') || bala.classList.contains('bonked')) { 
+                popUpTimeout = setTimeout(() => popUp(), 100); 
+                return; 
+            } 
+
+            // Escolhe uma cor aleatória para o balão.
+            const randomColor = colors[Math.floor(Math.random() * colors.length)]; 
+            // Gera um valor de pontos aleatório (1, 2 ou 3) para o balão.
+            const currentBalaValue = Math.floor(Math.random() * 3) + 1; 
+                
+            bala.textContent = currentBalaValue; // Define o número de pontos no balão. 
+            // Remove todas as classes de cor, 'bonked' e 'burst' para resetar o balão.
+            bala.classList.remove(...colors, 'bonked', 'burst'); 
+            // Adiciona a nova cor e a classe 'up' para fazê-lo subir.
+            bala.classList.add(randomColor, 'up'); 
+
+            const time = getPopUpTime(); // Obtém o tempo que o balão ficará visível.
+
+            // Define um timer para esconder o balão após o tempo definido.
+            popUpTimeout = setTimeout(() => { 
+                if (bala.classList.contains('up')) {  // Se o balão ainda estiver 'up' (não foi clicado)
+                    bala.classList.remove('up'); // Remove a classe 'up' para fazê-lo descer.
+                } 
+                // Se o tempo não acabou e o jogo ainda está ativo, chama popUp() novamente para o próximo balão.
+                if (!timeUp && gameActive) { 
+                    popUp(); 
+                } 
+            }, time); 
+        } 
+
+        /**
+         * Inicia o jogo, resetando pontuação, tempo e exibindo o jogo.
+         * Valida o nome do jogador antes de começar.
+         */
+        function startGame() { 
+            const name = usernameInput.value.trim(); // Pega o nome digitado e remove espaços em branco.
+            // Valida se o nome tem pelo menos 3 caracteres.
+            if (name.length < 3) { 
+                alert("Por favor, digite um nome de jogador com pelo menos 3 caracteres."); 
+                return; // Impede o início do jogo.
+            } 
+            currentPlayerName = name; // Define o nome do jogador atual.
+
+            // Reseta as variáveis do jogo
+            score = 0; 
+            timeLeft = 30; 
+            timeUp = false; 
+            gameActive = true; 
+            scoreDisplay.textContent = score; // Atualiza a exibição da pontuação.
+            timeDisplay.textContent = timeLeft; // Atualiza a exibição do tempo.
+            messageDisplay.textContent = `Boa sorte, ${currentPlayerName}! Acerte os balões! 🎉`; // Exibe mensagem de início.
+
+            gameOverlay.classList.add('hidden'); // Esconde o overlay (tela de início).
+
+            playSound(backgroundMusic); // Começa a tocar a música de fundo.
+
+            // Inicia o contador de tempo.
+            timerInterval = setInterval(() => {
+                timeLeft--; // Decrementa o tempo.
+                timeDisplay.textContent = timeLeft; // Atualiza a exibição do tempo.
+                if (timeLeft <= 0) { // Se o tempo chegar a 0
+                    clearInterval(timerInterval); // Para o contador de tempo.
+                    timeUp = true; // Define a flag de tempo esgotado.
+                    gameActive = false; // Desativa o jogo.
+                    messageDisplay.textContent = `Tempo esgotado, ${currentPlayerName}! Sua pontuação final é: ${score}!`; // Mensagem de fim de jogo.
+                    gameOver(); // Chama a função de fim de jogo.
+                }
+            }, 1000); // Executa a cada 1 segundo (1000ms).
+
+            popUp(); // Inicia o ciclo de aparecimento dos balões.
+        }
+
+        /**
+         * Função chamada quando um balão é clicado (bonked).
+         * Calcula a pontuação e aplica efeitos visuais.
+         * @param {Event} e - O evento de clique.
+         */
+        function bonk(e) {
+            // Se o jogo não estiver ativo ou o clique não foi em um balão, ignora.
+            if (!gameActive || !e.target.classList.contains('balao')) return;
+
+            playSound(bonkSound); // Toca o som de acerto.
+
+            const clickedBala = e.target; // O balão que foi clicado.
+            // Garante que só se pode clicar em balões que estão "para cima".
+            if (!clickedBala.classList.contains('up')) return; 
+
+            // Pega o valor de pontos do texto do balão e converte para número.
+            const points = parseInt(clickedBala.textContent);
+            score += points; // Adiciona os pontos à pontuação total.
+            scoreDisplay.textContent = score; // Atualiza o placar.
+            
+            // Efeito visual de estouro e pontos:
+            clickedBala.classList.remove('up'); // Faz o balão "descer" ou desaparecer do buraco.
+            clickedBala.classList.add('bonked'); // Adiciona a classe 'bonked' para ativar a animação de estouro.
+            
+            // Cria um efeito de texto (+pontos) no local do clique.
+            createScoreEffect(e.clientX, e.clientY, points);
+            // Cria confetes no local do clique, usando a cor do balão.
+            createConfetti(e.clientX, e.clientY, clickedBala.style.backgroundColor); // Passa a cor do balão
+
+            // Remove o balão 'bonked' após a animação para que ele possa ser reutilizado
+            clickedBala.addEventListener('animationend', function handler() {
+                clickedBala.classList.remove('bonked');
+                clickedBala.removeEventListener('animationend', handler); // Remove o listener após a execução
+            }, { once: true }); // Garante que o evento seja removido após ser disparado uma vez
+        }
+
+        /**
+         * Gerencia o fim do jogo.
+         * Para a música, toca som de fim de jogo, salva a pontuação e exibe o overlay final.
+         */
+        function gameOver() {
+            backgroundMusic.pause(); // Pausa a música de fundo.
+            backgroundMusic.currentTime = 0; // Reinicia a música para o próximo jogo.
+            playSound(gameOverSound); // Toca o som de fim de jogo.
+
+            clearTimeout(popUpTimeout); // Limpa qualquer timeout de pop-up pendente.
+            balas.forEach(bala => {
+                bala.classList.remove('up', 'bonked', ...colors); // Remove classes de todos os balões.
+                bala.textContent = ''; // Limpa o texto dos balões.
+            });
+
+            // Atualiza o overlay para exibir o resultado final.
+            overlayTitle.textContent = "Fim de Jogo!";
+            overlayMessage.innerHTML = `Sua pontuação final é: <span style="color: var(--color-primary); font-weight: bold;">${score} pontos</span>.<br>Parabéns, ${currentPlayerName}! Tente novamente para um novo recorde!`;
+            overlayStartButton.textContent = "Jogar Novamente"; // Muda o texto do botão.
+            gameOverlay.classList.remove('hidden'); // Mostra o overlay.
+            saveRanking(currentPlayerName, score); // Salva a pontuação no ranking.
+        }
+
+        /**
+         * Cria um pequeno texto de pontuação (+1, +2, etc.) que flutua e desaparece.
+         * @param {number} x - Coordenada X do clique.
+         * @param {number} y - Coordenada Y do clique.
+         * @param {number} points - Os pontos ganhos.
+         */
+        function createScoreEffect(x, y, points) {
+            const scoreEffect = document.createElement('div'); // Cria um novo elemento div.
+            scoreEffect.classList.add('score-effect'); // Adiciona a classe de estilo.
+            scoreEffect.textContent = `+${points}`; // Define o texto (ex: "+1").
+            scoreEffect.style.left = `${x}px`; // Posição X baseada no clique.
+            scoreEffect.style.top = `${y}px`; // Posição Y baseada no clique.
+            gameContainer.appendChild(scoreEffect); // Adiciona ao container do jogo.
+
+            // Remove o elemento após a animação.
+            scoreEffect.addEventListener('animationend', () => {
+                scoreEffect.remove();
+            });
+        }
+
+        /**
+         * Cria múltiplos confetes que voam para cima e desaparecem.
+         * @param {number} x - Coordenada X do clique.
+         * @param {number} y - Coordenada Y do clique.
+         * @param {string} color - A cor dos confetes.
+         */
+        function createConfetti(x, y, color) {
+            const numConfetti = 10; // Número de confetes a serem criados.
+            for (let i = 0; i < numConfetti; i++) {
+                const confetti = document.createElement('div'); // Cria um novo div para cada confete.
+                confetti.classList.add('confetti'); // Adiciona a classe de estilo.
+                confetti.style.left = `${x + (Math.random() - 0.5) * 40}px`; // Posição X aleatória ao redor do clique.
+                confetti.style.top = `${y + (Math.random() - 0.5) * 40}px`; // Posição Y aleatória ao redor do clique.
+                confetti.style.backgroundColor = color; // Define a cor do confete.
+                // Gera um atraso aleatório para que os confetes não apareçam todos ao mesmo tempo.
+                confetti.style.animationDelay = `${Math.random() * 0.2}s`;
+                gameContainer.appendChild(confetti); // Adiciona ao container do jogo.
+
+                // Remove o confete após sua animação.
+                confetti.addEventListener('animationend', () => {
+                    confetti.remove();
+                });
+            }
+        }
+
+        // --- Event Listeners ---
+        // Adiciona um ouvinte de evento para cliques em todo o container do jogo.
+        // Isso é mais eficiente do que adicionar um ouvinte a cada balão individualmente (event delegation).
+        gameContainer.addEventListener('click', bonk);
+
+        // Ouve o clique no botão "Começar Jogo" do overlay.
+        overlayStartButton.addEventListener('click', startGame);
+
+        // Ouve o clique no botão "Limpar Ranking".
+        clearRankButton.addEventListener('click', clearRankings);
+
+        // Quando o DOM estiver completamente carregado, exibe o ranking inicial.
+        document.addEventListener('DOMContentLoaded', displayRankings);
+    </script>
+</body>
+</html>
